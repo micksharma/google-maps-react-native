@@ -6,8 +6,8 @@ const LINKING_ERROR =
   '- You rebuilt the app after installing the package\n' +
   '- You are not using Expo Go\n';
 
-const Map = NativeModules.Map
-  ? NativeModules.Map
+const CalendarModules = NativeModules.CalendarModule
+  ? NativeModules.CalendarModule
   : new Proxy(
       {},
       {
@@ -17,6 +17,4 @@ const Map = NativeModules.Map
       }
     );
 
-export function multiply(a: number, b: number): Promise<number> {
-  return Map.multiply(a, b);
-}
+export default CalendarModules;
