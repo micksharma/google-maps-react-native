@@ -366,10 +366,21 @@ import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.EditText;
+import androidx.core.content.ContextCompat;
+import android.content.Context;
+import android.graphics.Color;
+import android.text.TextPaint;
+import android.text.method.LinkMovementMethod;
+import android.util.TypedValue;
+import android.view.View;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
 
 
 public class CustomView extends FrameLayout implements OnMapReadyCallback {
-  
+
   private static final long DEBOUNCE_DELAY = 300;
   private Handler debounceHandler = new Handler(Looper.getMainLooper());
   private ViewFlipper viewFlipper;
@@ -434,8 +445,6 @@ public class CustomView extends FrameLayout implements OnMapReadyCallback {
    this.addView(viewFlipper);
   //  RequestQueue requestQueue = Volley.newRequestQueue(context);
 
-  
-
     mapView = new MapView(context);
     mapView.onCreate(null);
     mapView.getMapAsync(this);
@@ -450,8 +459,6 @@ public class CustomView extends FrameLayout implements OnMapReadyCallback {
     page1 = new RelativeLayout(context);
 
     RelativeLayout searchLayout = new RelativeLayout(context);
-
-
     currentLocationButton = new Button(context);
     currentLocationButton.setText("Current Location");
 
@@ -462,7 +469,6 @@ public class CustomView extends FrameLayout implements OnMapReadyCallback {
 
     currentLocationButton.setBackground(buttonBackground);
 
-
     RelativeLayout.LayoutParams buttonParams = new RelativeLayout.LayoutParams(
       RelativeLayout.LayoutParams.WRAP_CONTENT,
       RelativeLayout.LayoutParams.WRAP_CONTENT
@@ -470,13 +476,13 @@ public class CustomView extends FrameLayout implements OnMapReadyCallback {
 
     buttonParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
     buttonParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-    buttonParams.setMargins(300, 1000, 60, 60);
+    buttonParams.setMargins(150, 200, 300, 600);
     currentLocationButton.setLayoutParams(buttonParams);
 
     // this.addView(currentLocationButton);
     // suggestionListView = new ListView(context);
     // suggestionListView.setVisibility(View.GONE);
-    
+
 //   Add Search TextInput
     suggestionListView = new ListView(context);
     suggestionListView.setVisibility(View.GONE);
@@ -484,7 +490,7 @@ public class CustomView extends FrameLayout implements OnMapReadyCallback {
     RelativeLayout.LayoutParams.MATCH_PARENT,
     RelativeLayout.LayoutParams.WRAP_CONTENT
 );
-   
+
    suggestionListParams.setMargins(0,120, 0, 0);
    suggestionListView.setLayoutParams(suggestionListParams);
 
@@ -493,17 +499,24 @@ public class CustomView extends FrameLayout implements OnMapReadyCallback {
     suggestionListView.setAdapter(suggestionAdapter);
 
     searchTextInput = new EditText(context);
-    searchTextInput.setHint("Enter Destination");
-    searchTextInput.setBackgroundColor(Color.WHITE);
+    // searchTextInput.setCornerRadius(12);
+   searchTextInput.setHint("Search");
+//    searchTextInput.setMargins(50,16,16,0);
+   GradientDrawable drawable = new GradientDrawable();
+   drawable.setShape(GradientDrawable.RECTANGLE);
+   drawable.setColor(Color.WHITE); // Set background color
+
+   drawable.setCornerRadius(12);   // Set corner radius
+
+// Apply the drawable as the background of the EditText
+   searchTextInput.setBackground(drawable);
 
     suggestionListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         String selectedLocation = suggestions.get(position);
-
         // Update the distanceTextView with the selected location
         distanceTextView.setText("Distance: " + selectedLocation);
-
         // Navigate back to page1
         page2.removeView(searchTextInput);
         page2.removeView(searchButton);
@@ -513,8 +526,6 @@ public class CustomView extends FrameLayout implements OnMapReadyCallback {
         viewFlipper.showPrevious(); // Navigate back to Page 1
     }
 });
-
-
      searchTextInput.addTextChangedListener(new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -530,113 +541,57 @@ public class CustomView extends FrameLayout implements OnMapReadyCallback {
             }
         }
     });
-    // searchTextInput.addTextChangedListener(new TextWatcher() {
-    //   @Override
-    //     public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
-    //     @Override
-    //     public void onTextChanged(CharSequence s, int start, int before, int count) { }
-
-    //     @Override
-    //     public void afterTextChanged(Editable s) {
-    //         // Cancel any previous debounce runnable
-    //         if (debounceRunnable != null) {
-    //             debounceHandler.removeCallbacks(debounceRunnable);
-    //         }
-    //         // Schedule a new debounce runnable
-    //         debounceRunnable = new Runnable() {
-    //             @Override
-    //             public void run() {
-    //                 String query = s.toString();
-    //                 if (!query.isEmpty()) {
-    //                     fetchSuggestionsFromGoogle(query);
-    //                 }
-    //             }
-    //         };
-    //         debounceHandler.postDelayed(debounceRunnable, DEBOUNCE_DELAY);
-    //     }
-    // });
 
     RelativeLayout.LayoutParams searchParams = new RelativeLayout.LayoutParams(
-      RelativeLayout.LayoutParams.WRAP_CONTENT,
-      RelativeLayout.LayoutParams.WRAP_CONTENT
+      800,
+      110
     );
 
     searchParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-    searchParams.setMargins(16,16,16,0);
+    searchParams.setMargins(120,30,16,0);
 
     searchTextInput.setLayoutParams(searchParams);
 
-    // searchTextInput.addTextChangedListener(new TextWatcher() {
-    //     @Override
-    //     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-    //      }
-
-    //     @Override
-    //     public void onTextChanged(CharSequence s, int start, int before, int count) { }
-
-    //     @Override
-    //     public void afterTextChanged(Editable s) {
-    //         if (debounceRunnable != null) {
-    //             debounceHandler.removeCallbacks(debounceRunnable);
-    //         }
-    //         debounceRunnable = new Runnable() {
-    //             @Override
-    //             public void run() {
-    //                 String query = s.toString();
-    //                 if (!query.isEmpty()) {
-    //                     fetchSuggestionsFromGoogle(query);
-    //                 }
-    //             }
-    //         };
-    //         debounceHandler.postDelayed(debounceRunnable, DEBOUNCE_DELAY);
-    //     }
-    // });
-   
-    // this.addView(searchTextInput);
 
     // Add Search Button
 
     searchButton = new Button(context);
-    searchButton.setText("Search");
 
+    GradientDrawable borderDrawable = new GradientDrawable();
+    borderDrawable.setShape(GradientDrawable.RECTANGLE);
+    borderDrawable.setColor(Color.WHITE);
+    borderDrawable.setStroke(2, Color.parseColor("#5698FB"));
+
+    searchButton.setBackground(borderDrawable);
+
+    Drawable searchIcon = ContextCompat.getDrawable(context ,R.drawable.search_icon);
+    int width = 48;
+    int height =  48;
+    searchIcon.setBounds(0,0,width , height);
+
+
+//    searchButton.setCompoundDrawablesWithIntrinsicBounds(searchIcon, null, null, null);
+    searchButton.setCompoundDrawables(searchIcon, null, null, null);
+    searchButton.setCompoundDrawablePadding(8);
+    searchButton.setBackgroundColor(Color.WHITE);
     RelativeLayout.LayoutParams searchButtonParams = new RelativeLayout.LayoutParams(
-      RelativeLayout.LayoutParams.WRAP_CONTENT,
-      RelativeLayout.LayoutParams.WRAP_CONTENT
+     100,
+     110
     );
 
-    searchButtonParams.addRule(RelativeLayout.BELOW , searchTextInput.getId());
-    searchButtonParams.setMargins(460,16,16,0);
+    searchButtonParams.addRule(RelativeLayout.BELOW,searchTextInput.getId());
+    searchButtonParams.setMargins(30,30,16,0);
     searchButton.setLayoutParams(searchButtonParams);
-    // this.addView(searchButton);
-
-    // suggestionListView = new ListView(context);
-    // suggestionListView.setVisibility(View.GONE);
-    
-
-
-    //  RelativeLayout.LayoutParams suggestionListParams = new RelativeLayout.LayoutParams(
-    //         RelativeLayout.LayoutParams.MATCH_PARENT,
-    //         RelativeLayout.LayoutParams.WRAP_CONTENT
-    //     );
-      //  suggestionListParams.addRule(RelativeLayout.BELOW, searchTextInput.getId());
-      //  suggestionListView.setLayoutParams(suggestionListParams);
-
-      //   suggestions = new ArrayList<>();
-      //   suggestionAdapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, suggestions);
-      //   suggestionListView.setAdapter(suggestionAdapter);
-
-    // List<String> suggestions = new ArrayList<>();
-    // suggestionAdapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, suggestions);
-    // suggestionListView.setAdapter(suggestionAdapter);
 
     distanceTextView = new TextView(context);
-    distanceTextView.setText("Distance: ");
+    distanceTextView.setText("Location: ");
+   
     distanceTextView.setTextSize(16); // Set text size if needed
     distanceTextView.setTextColor(Color.BLACK); // Set text color if needed
     distanceTextView.setBackgroundColor(Color.WHITE); // Set background color to white
-   
+
 
     // Get the height of the screen
     DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -646,20 +601,113 @@ public class CustomView extends FrameLayout implements OnMapReadyCallback {
     // Set LayoutParams to occupy 1/4 of the screen height
     RelativeLayout.LayoutParams distanceTextParams = new RelativeLayout.LayoutParams(
       RelativeLayout.LayoutParams.MATCH_PARENT,
-      screenHeight / 10
+      screenHeight / 5
     );
     distanceTextParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-    distanceTextParams.setMargins(50, 1200, 50, 50); // Optional: Adjust margins if needed
+    distanceTextParams.setMargins(0, 1200,0, 0); // Optional: Adjust margins if needed
     distanceTextView.setLayoutParams(distanceTextParams);
 
-    // this.addView(distanceTextView);
+    // changeButton.setTextColor(Color.parseColor("#5698FB"));
 
+    // Button changeButton = new Button(context);
+    // changeButton.setText("Change");    
+    // changeButton.setTextColor(Color.parseColor("#5698FB"));
+
+    // GradientDrawable changeDrawable = new GradientDrawable();
+    // // changeDrawable.setShape(GradienDrawable.RECTANGLE);
+    // changeDrawable.setShape(GradientDrawable.RECTANGLE);
+    // changeDrawable.setColor(Color.WHITE);
+    // changeDrawable.setStroke(1 , Color.WHITE);
+
+    // changeButton.setBackground(changeDrawable);
+
+    // RelativeLayout.LayoutParams changeButtonParams = new RelativeLayout.LayoutParams(
+    //         RelativeLayout.LayoutParams.WRAP_CONTENT ,
+    //         RelativeLayout.LayoutParams.WRAP_CONTENT
+    // );
+    // int changeMarginLeft = 700; // Set left margin
+    // int changeMarginTop = 1810;  // Set top margin
+    // int changeMarginRight = 70; // Set right margin
+    // int changeMarginBottom = 300; // Set bottom margin
+    // changeButtonParams.setMargins(changeMarginLeft, changeMarginTop, changeMarginRight, changeMarginBottom);
+        
+    // changeButton.setLayoutParams(changeButtonParams);
+
+    TextView clickableTextView = new TextView(context);
+    clickableTextView.setText("Change");
+    clickableTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+    clickableTextView.setTextColor(Color.parseColor("#5698FB"));
+
+    clickableTextView.setClickable(true);
+    clickableTextView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Handle the click event
+                // Toast.makeText(context, "Text clicked!", Toast.LENGTH_SHORT).show();
+                page1.removeView(searchTextInput);
+            page1.removeView(searchButton);
+            page2.addView(searchTextInput);
+            page2.addView(searchButton);
+            suggestionListView.setVisibility(View.VISIBLE); // Show suggestions
+            page2.addView(suggestionListView);
+            // viewFlipper.showNext();// Na
+            navigateToPage2();
+            }
+        });
+
+      TextPaint textPaint = clickableTextView.getPaint();
+      textPaint.setUnderlineText(true); // Set unde
+
+      RelativeLayout.LayoutParams textParams = new RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams.WRAP_CONTENT,
+            RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+        // textParams.addRule(RelativeLayout.CENTER_IN_PARENT); // Center the text in the parent layout
+        textParams.setMargins(800 , 1850 , 100 ,200);
+        clickableTextView.setLayoutParams(textParams);  
+ 
+     
+
+    Button confirmButton = new Button(context);
+    confirmButton.setText("Confirm the Store Location");
+    confirmButton.setTextColor(Color.WHITE);
+
+   
+    GradientDrawable buttonDrawable = new GradientDrawable();
+    buttonDrawable.setShape(GradientDrawable.RECTANGLE);
+    buttonDrawable.setColor(Color.parseColor("#5698FB"));
+    buttonDrawable.setStroke(2, Color.parseColor("#5698FB"));
+
+    float cornerRadius = 16f;
+    buttonDrawable.setCornerRadius(cornerRadius);
+    
+    //  confirmButton.setBackground(Color.parseColor("#5698FB"));
+    
+ 
+     confirmButton.setBackground(buttonDrawable);
+      RelativeLayout.LayoutParams confirmButtonParams = new RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams.WRAP_CONTENT ,
+            RelativeLayout.LayoutParams.WRAP_CONTENT
+          );
+        int marginLeft = 250; // Set left margin
+        int marginTop = 2000;  // Set top margin
+        int marginRight = 100; // Set right margin
+        int marginBottom = 1; // Set bottom margin
+        confirmButtonParams.setMargins(marginLeft, marginTop, marginRight, marginBottom);
+        
+        confirmButton.setLayoutParams(confirmButtonParams);
+  
+   
+    // this.addView(distanceTextView);
         page1.addView(mapView);
         page1.addView(currentLocationButton);
         page1.addView(searchTextInput);
         page1.addView(searchButton);
         page1.addView(distanceTextView);
-
+        // page1.addView(changeButton);
+        page1.addView(clickableTextView);
+        page1.addView(confirmButton);
+        
 
      page2 = new RelativeLayout(context);
         TextView page2Text = new TextView(context);
@@ -670,7 +718,7 @@ public class CustomView extends FrameLayout implements OnMapReadyCallback {
         page2Text.setTextColor(Color.BLACK);
         page2Text.setPadding(100, 100, 100, 100);
 
-         Button backButton = new Button(context);
+        Button backButton = new Button(context);
         backButton.setText("Go Back");
         RelativeLayout.LayoutParams backButtonParams = new RelativeLayout.LayoutParams(
             RelativeLayout.LayoutParams.WRAP_CONTENT,
@@ -697,13 +745,16 @@ public class CustomView extends FrameLayout implements OnMapReadyCallback {
         // page2.addView(page2Text);
         // page2.addView(searchTextInput);
         // page2.addView(searchButton);
-           page2.addView(backButton);
+        //  page2.addView(backButton);
+          
+
+
 
 
         viewFlipper.addView(page1);
         viewFlipper.addView(page2);
 
-    
+
 
     //
     searchButton.setOnClickListener(new OnClickListener() {
@@ -725,9 +776,6 @@ public class CustomView extends FrameLayout implements OnMapReadyCallback {
         }, 1000);
       }
     });
-
-     
-
     currentLocationButton.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
@@ -750,7 +798,7 @@ public class CustomView extends FrameLayout implements OnMapReadyCallback {
             page2.addView(searchButton);
             suggestionListView.setVisibility(View.VISIBLE); // Show suggestions
             page2.addView(suggestionListView);
-            // viewFlipper.showNext();  // Na
+            // viewFlipper.showNext();// Na
             navigateToPage2();
       }
     });
@@ -760,7 +808,7 @@ public class CustomView extends FrameLayout implements OnMapReadyCallback {
   private void searchLocation(String locationName) {
 
     Geocoder geocoder = new Geocoder(getContext());
-     
+
     try {
       List<Address> addresses = geocoder.getFromLocationName(locationName, 1);
       if (addresses != null && addresses.size() > 0) {
@@ -786,7 +834,7 @@ public class CustomView extends FrameLayout implements OnMapReadyCallback {
           Location.distanceBetween(currentLatLng.latitude, currentLatLng.longitude,
             searchLatLng.latitude, searchLatLng.longitude, distanceResult);
           float distanceInKm = distanceResult[0] / 1000; // Convert to kilometers
-          distanceTextView.setText("Distance: " + distanceInKm + " km");
+          distanceTextView.setText("Location:" + distanceInKm);
            Log.d("CustomView1234","Location is filled");
             Log.d("CustomView1234", "Distance calculated: " + distanceInKm + " km");
           String directionsUrl = getDirectionsUrl(currentLatLng, searchLatLng);
@@ -813,25 +861,25 @@ public class CustomView extends FrameLayout implements OnMapReadyCallback {
 //                 try {
 //                     JSONArray predictions = response.getJSONArray("predictions");
 //                     List<String> suggestions = new ArrayList<>();
-                    
+
 //                     for (int i = 0; i < predictions.length(); i++) {
 //                         JSONObject prediction = predictions.getJSONObject(i);
 //                         String description = prediction.getString("description");
 //                         suggestions.add(description);
 //                     }
-                    
+
 //                     // Update ListView with suggestions
 //                     suggestionAdapter.clear();
 //                     suggestionAdapter.addAll(suggestions);
 //                     suggestionAdapter.notifyDataSetChanged();
-                    
+
 //                     // Show suggestions on Page 2
 //                     if (viewFlipper.getDisplayedChild() != 1) {
 //                         viewFlipper.showNext(); // Navigate to Page 2
 //                     }
 //                     page1.addView(suggestionListView);
 //                     suggestionListView.setVisibility(View.VISIBLE);
-                    
+
 //                 } catch (JSONException e) {
 //                     e.printStackTrace();
 //                 }
@@ -847,7 +895,7 @@ public class CustomView extends FrameLayout implements OnMapReadyCallback {
 // }
 
 private void fetchSuggestionsFromGoogle(String query) {
-  
+
     String url = "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=" + query + "&key=AIzaSyCssBlgbisMPbKCohNoIIgycQFpJKe0_oM";
     Log.d("CustomViewFetch","fetch" + url);
     JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
@@ -856,7 +904,7 @@ private void fetchSuggestionsFromGoogle(String query) {
               Log.d("CustomViewFetch2","fetch"+ response);
                 JSONArray predictions = response.getJSONArray("predictions");
                 List<String> newSuggestions = new ArrayList<>();
-               
+
                 for (int i = 0; i < predictions.length(); i++) {
                     Log.d("CustomViewFetch5","fetch");
                     JSONObject prediction = predictions.getJSONObject(i);
@@ -1067,7 +1115,7 @@ private void fetchSuggestionsFromGoogle(String query) {
       return poly;
     }
   }
- 
+
    private void navigateToPage2() {
         viewFlipper.showNext();
    }
